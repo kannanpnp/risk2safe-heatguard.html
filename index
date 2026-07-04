@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Risk2Safe HeatGuard — Heat Stress Management Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16212E; --ink-2:#22303F; --ink-3:#31414F;
+  --surface:#F2F3EF; --card:#FFFFFF; --line:#D8DAD3; --line-2:#E8E9E4;
+  --amber:#FFB000; --amber-dk:#C78700;
+  --txt:#1B2430; --txt-2:#5A6572; --txt-3:#8B939D;
+  --flag-white:#F4F4F4; --flag-green:#2E9E5B; --flag-yellow:#F5C518;
+  --flag-orange:#E8722A; --flag-red:#D8342C; --flag-black:#141414;
+  --ok:#2E9E5B; --warn:#E8722A; --bad:#D8342C;
+  --r:10px; --r-sm:6px;
+  --disp:'Barlow Condensed',sans-serif; --body:'Inter',sans-serif; --mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--body);background:var(--surface);color:var(--txt);font-size:15px;line-height:1.5;min-height:100vh}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:15px}
+
+/* ---------- header ---------- */
+header{background:var(--ink);color:#fff;padding:0}
+.hd-top{display:flex;align-items:center;gap:14px;padding:14px 18px;max-width:1200px;margin:0 auto}
+.hd-mark{width:42px;height:42px;border-radius:8px;background:var(--amber);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hd-mark svg{width:26px;height:26px}
+.hd-title{font-family:var(--disp);font-size:26px;font-weight:700;letter-spacing:.5px;line-height:1.05}
+.hd-sub{font-size:11.5px;color:#9FB0C0;letter-spacing:.4px;margin-top:2px}
+.hd-clock{margin-left:auto;text-align:right;font-family:var(--mono);font-size:12px;color:#B8C4CF;line-height:1.4}
+.hd-clock b{color:var(--amber);font-weight:600}
+
+/* ---------- tabs ---------- */
+nav{background:var(--ink-2);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.tabs{display:flex;max-width:1200px;margin:0 auto;padding:0 10px}
+.tab{background:none;border:none;color:#9FB0C0;font-family:var(--disp);font-size:16px;font-weight:600;letter-spacing:.6px;padding:12px 15px;white-space:nowrap;border-bottom:3px solid transparent;text-transform:uppercase}
+.tab:hover{color:#fff}
+.tab.active{color:var(--amber);border-bottom-color:var(--amber)}
+
+main{max-width:1200px;margin:0 auto;padding:20px 16px 70px}
+.pane{display:none}
+.pane.active{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.pane.active{animation:none}}
+
+/* ---------- generic ---------- */
+.grid{display:grid;gap:16px}
+.dash-grid{grid-template-columns:340px 1fr;align-items:start}
+@media(max-width:920px){.dash-grid{grid-template-columns:1fr}.dash-grid .card{position:static!important}}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:820px){.g2,.g3{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.card h2{font-family:var(--disp);font-size:21px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:4px}
+.card .kicker{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--amber-dk);margin-bottom:2px}
+.card .note{font-size:12.5px;color:var(--txt-2);margin-bottom:14px}
+.frow{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.frow label{font-size:12px;font-weight:600;letter-spacing:.3px;color:var(--txt-2);text-transform:uppercase}
+.frow input,.frow select,.frow textarea{padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;width:100%}
+.frow input:focus,.frow select:focus,.frow textarea:focus{outline:2px solid var(--amber);outline-offset:1px;border-color:var(--amber)}
+.frow .hint{font-size:11.5px;color:var(--txt-3)}
+.irow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.irow{grid-template-columns:1fr}}
+.btn{background:var(--ink);color:#fff;border:none;border-radius:var(--r-sm);padding:12px 20px;font-weight:600;font-size:14px;letter-spacing:.3px}
+.btn:hover{background:var(--ink-3)}
+.btn.amber{background:var(--amber);color:var(--ink)}
+.btn.amber:hover{background:#E5A000}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn.sm{padding:8px 14px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.mono{font-family:var(--mono)}
+.readout{font-family:var(--mono);font-size:30px;font-weight:600;line-height:1.1}
+.readout small{font-size:14px;color:var(--txt-3);font-weight:400}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-family:var(--disp);font-size:14px;letter-spacing:.6px;text-transform:uppercase;text-align:left;padding:8px 10px;background:var(--ink);color:#fff}
+td{padding:8px 10px;border-bottom:1px solid var(--line-2);vertical-align:top}
+tr:nth-child(even) td{background:#FAFAF7}
+.twrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-sm)}
+.divider{height:1px;background:var(--line);margin:16px 0}
+.alertbox{border-radius:var(--r-sm);padding:12px 14px;font-size:13.5px;margin:10px 0;border:1px solid}
+.alertbox.ok{background:#EDF7F0;border-color:#BCE0C9;color:#1D6B3D}
+.alertbox.warn{background:#FDF1E7;border-color:#F3CDAE;color:#9A4A15}
+.alertbox.bad{background:#FBEBEA;border-color:#F0BBB8;color:#8F211B}
+.alertbox.info{background:#EEF3F8;border-color:#C9D8E6;color:#2C4A66}
+
+/* ---------- signature: heat flag gauge ---------- */
+.gauge-card{background:var(--ink);color:#fff;border:none;border-radius:var(--r);padding:22px 20px 26px;position:relative;overflow:hidden}
+.gauge-card::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent 0 26px,rgba(255,176,0,.045) 26px 52px);pointer-events:none}
+.gauge-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.gauge-title{font-family:var(--disp);font-size:22px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.gauge-sub{font-size:12px;color:#9FB0C0;margin-top:2px}
+.flagchip{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px 14px}
+.flagchip .swatch{width:22px;height:16px;border-radius:3px;border:1px solid rgba(255,255,255,.4);box-shadow:0 0 0 1px rgba(0,0,0,.3)}
+.flagchip .fname{font-family:var(--disp);font-size:19px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.spectrum{position:relative;height:56px;margin:8px 4px 30px}
+.spectrum .band{position:absolute;inset:14px 0;border-radius:6px;background:linear-gradient(90deg,#2E9E5B 0%,#2E9E5B 30%,#F5C518 42%,#E8722A 58%,#D8342C 74%,#141414 92%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+.spectrum .tick{position:absolute;top:46px;font-family:var(--mono);font-size:10.5px;color:#9FB0C0;transform:translateX(-50%)}
+.needle{position:absolute;top:2px;transform:translateX(-50%);transition:left .5s cubic-bezier(.4,0,.2,1);text-align:center}
+@media (prefers-reduced-motion:reduce){.needle{transition:none}}
+.needle .stem{width:3px;height:40px;background:#fff;margin:0 auto;border-radius:2px;box-shadow:0 0 6px rgba(0,0,0,.6)}
+.needle .val{position:absolute;top:-4px;left:50%;transform:translate(-50%,-100%);background:var(--amber);color:var(--ink);font-family:var(--mono);font-size:12px;font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap}
+.gauge-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;position:relative}
+@media(max-width:680px){.gauge-stats{grid-template-columns:1fr 1fr}}
+.gstat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 12px}
+.gstat .lbl{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:#9FB0C0}
+.gstat .v{font-family:var(--mono);font-size:21px;font-weight:600;margin-top:2px}
+.gstat .v small{font-size:12px;color:#9FB0C0}
+.gauge-directive{margin-top:16px;background:rgba(255,176,0,.12);border:1px solid rgba(255,176,0,.4);border-radius:8px;padding:12px 14px;font-size:13.5px;position:relative}
+.gauge-directive b{color:var(--amber)}
+
+/* first aid tree */
+.fa-step{border:1.5px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:12px}
+.fa-q{font-family:var(--disp);font-size:20px;font-weight:700;margin-bottom:12px}
+.fa-btns{display:flex;gap:10px;flex-wrap:wrap}
+.fa-outcome{border-radius:var(--r);padding:18px;font-size:14.5px}
+.fa-outcome.emergency{background:#8F211B;color:#fff}
+.fa-outcome.emergency h3{font-family:var(--disp);font-size:24px;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.fa-outcome.caution{background:#FDF1E7;border:1.5px solid #E8722A;color:#7A3A10}
+.fa-outcome.caution h3{font-family:var(--disp);font-size:22px;text-transform:uppercase;margin-bottom:8px;color:#B04E12}
+.fa-outcome ul{margin:8px 0 0 18px}
+.fa-outcome li{margin-bottom:5px}
+
+/* AI output */
+.ai-out{background:#FBFBF8;border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;font-size:14px;white-space:pre-wrap;line-height:1.65;min-height:60px}
+.spinner{display:inline-block;width:16px;height:16px;border:2.5px solid var(--line);border-top-color:var(--amber-dk);border-radius:50%;animation:spin .7s linear infinite;vertical-align:-3px;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* permit print */
+.permit-doc{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:26px;margin-top:16px}
+.permit-doc h1{font-family:var(--disp);font-size:26px;letter-spacing:.6px;text-transform:uppercase;border-bottom:3px solid var(--ink);padding-bottom:8px;margin-bottom:14px}
+.permit-doc .prow{display:flex;justify-content:space-between;gap:14px;border-bottom:1px dotted var(--line);padding:6px 0;font-size:13.5px}
+.permit-doc .prow b{min-width:200px}
+.permit-doc h3{font-family:var(--disp);font-size:17px;text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px}
+.sigline{display:flex;gap:30px;margin-top:26px}
+.sigline div{flex:1;border-top:1.5px solid var(--ink);padding-top:6px;font-size:12px;color:var(--txt-2)}
+@media print{
+  header,nav,.no-print{display:none!important}
+  body{background:#fff}
+  main{padding:0;max-width:none}
+  .pane{display:none!important}
+  #pane-permit{display:block!important}
+  #pane-permit .card:not(.permit-print-keep){display:none}
+  .permit-doc{border:none;padding:0}
+}
+footer{text-align:center;font-size:11.5px;color:var(--txt-3);padding:18px;border-top:1px solid var(--line);max-width:1200px;margin:0 auto}
+.disclaimer{font-size:11.5px;color:var(--txt-3);margin-top:12px;line-height:1.5}
+</style>
+</head>
+<body>
+<header>
+  <div class="hd-top">
+    <div class="hd-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2c-2 4-6 6.5-6 11a6 6 0 0 0 12 0c0-4.5-4-7-6-11Z" stroke="#16212E" stroke-width="2" fill="#16212E"/><path d="M12 17.5a2.5 2.5 0 0 1-2.5-2.5c0-1.6 1.4-2.6 2.5-4 1.1 1.4 2.5 2.4 2.5 4a2.5 2.5 0 0 1-2.5 2.5Z" fill="#FFB000"/></svg>
+    </div>
+    <div>
+      <div class="hd-title">RISK2SAFE HEATGUARD</div>
+      <div class="hd-sub">Heat Stress Management Suite · ISO 7243 · ACGIH TLV · TWL · GCC Regulations</div>
+    </div>
+    <div class="hd-clock" id="hdClock"></div>
+  </div>
+  <nav>
+    <div class="tabs" role="tablist" id="tabbar">
+      <button class="tab active" data-pane="dash">Dashboard</button>
+      <button class="tab" data-pane="calc">WBGT · TWL</button>
+      <button class="tab" data-pane="plan">Work-Rest</button>
+      <button class="tab" data-pane="gcc">GCC Compliance</button>
+      <button class="tab" data-pane="accl">Acclimatization</button>
+      <button class="tab" data-pane="aid">First Aid</button>
+      <button class="tab" data-pane="ai">AI Tools</button>
+      <button class="tab" data-pane="permit">Heat Permit</button>
+      <button class="tab" data-pane="set">Settings</button>
+    </div>
+  </nav>
+</header>
+<main>
+
+<!-- ================= DASHBOARD ================= -->
+<section class="pane active" id="pane-dash">
+  <div class="grid dash-grid">
+    <div class="card" id="dashInputs" style="position:sticky;top:12px">
+      <div class="kicker">Site conditions</div>
+      <h2>Current Readings</h2>
+      <div class="note">Enter conditions from your weather station or heat stress monitor.</div>
+      <div class="irow">
+        <div class="frow"><label for="d_ta">Air temp °C</label><input type="number" id="d_ta" value="42" step="0.5" inputmode="decimal"></div>
+        <div class="frow"><label for="d_rh">Humidity %RH</label><input type="number" id="d_rh" value="35" step="1" min="1" max="100" inputmode="decimal"></div>
+      </div>
+      <div class="irow">
+        <div class="frow"><label for="d_ws">Wind m/s</label><input type="number" id="d_ws" value="1.5" step="0.5" min="0" inputmode="decimal"></div>
+        <div class="frow"><label for="d_sun">Sun exposure</label>
+          <select id="d_sun"><option value="full">Full sun</option><option value="partial">Partial shade</option><option value="shade">Full shade / indoor</option></select></div>
+      </div>
+      <div class="frow"><label for="d_work">Metabolic workload</label>
+        <select id="d_work">
+          <option value="light">Light — sitting, light hand work (~180 W)</option>
+          <option value="moderate" selected>Moderate — walking, moderate lifting (~300 W)</option>
+          <option value="heavy">Heavy — shovelling, heavy material handling (~415 W)</option>
+          <option value="vheavy">Very heavy — intense pace work (~520 W)</option>
+        </select></div>
+      <div class="frow"><label for="d_cloth">Clothing</label>
+        <select id="d_cloth">
+          <option value="0">Work coveralls / shirt &amp; trousers (+0 °C)</option>
+          <option value="0.5">SMS polypropylene coveralls (+0.5 °C)</option>
+          <option value="1">Polyolefin coveralls (+1 °C)</option>
+          <option value="3">Double-layer woven clothing (+3 °C)</option>
+          <option value="11">Vapour-barrier / encapsulating (+11 °C)</option>
+        </select></div>
+      <div class="frow"><label for="d_accl">Workforce acclimatization</label>
+        <select id="d_accl"><option value="acc">Acclimatized (&gt;2 weeks in heat)</option><option value="unacc">Not acclimatized / new / returning</option></select></div>
+      <button class="btn amber" style="width:100%" onclick="runDashboard()">Assess Heat Risk</button>
+    </div>
+
+    <div>
+      <div class="gauge-card">
+        <div class="gauge-head">
+          <div>
+            <div class="gauge-title">Site Heat Flag</div>
+            <div class="gauge-sub" id="gaugeSub">Enter conditions and assess to raise the flag</div>
+          </div>
+          <div class="flagchip"><span class="swatch" id="flagSwatch" style="background:#666"></span><span class="fname" id="flagName">— STANDBY —</span></div>
+        </div>
+        <div class="spectrum">
+          <div class="band"></div>
+          <div class="needle" id="needle" style="left:4%"><span class="val" id="needleVal">–</span><div class="stem"></div></div>
+          <span class="tick" style="left:6%">WBGT 25</span><span class="tick" style="left:33%">28</span><span class="tick" style="left:50%">30</span><span class="tick" style="left:66%">32</span><span class="tick" style="left:82%">34</span><span class="tick" style="left:96%">36+</span>
+        </div>
+        <div class="gauge-stats">
+          <div class="gstat"><div class="lbl">WBGT (est.)</div><div class="v" id="gWbgt">–<small> °C</small></div></div>
+          <div class="gstat"><div class="lbl">Effective WBGT</div><div class="v" id="gWbgtEff">–<small> °C</small></div></div>
+          <div class="gstat"><div class="lbl">TWL (indicative)</div><div class="v" id="gTwl">–<small> W/m²</small></div></div>
+          <div class="gstat"><div class="lbl">Work : Rest</div><div class="v" id="gWr">–</div></div>
+        </div>
+        <div class="gauge-directive" id="gDirective"><b>Standby.</b> Complete the site conditions panel and press Assess Heat Risk.</div>
+      </div>
+
+      <div class="grid g2" style="margin-top:16px">
+        <div class="card">
+          <div class="kicker">Hydration</div>
+          <h2>Fluid Plan</h2>
+          <div id="hydroOut" class="note" style="margin-bottom:0">Run an assessment to generate the hydration plan.</div>
+        </div>
+        <div class="card">
+          <div class="kicker">Regulatory</div>
+          <h2>Midday Ban Status</h2>
+          <div class="frow"><label for="d_country">Country</label>
+            <select id="d_country" onchange="banStatus()">
+              <option value="AE">United Arab Emirates</option><option value="SA">Saudi Arabia</option>
+              <option value="QA">Qatar</option><option value="KW">Kuwait</option>
+              <option value="BH">Bahrain</option><option value="OM">Oman</option>
+            </select></div>
+          <div id="banOut"></div>
+        </div>
+      </div>
+      <div class="disclaimer">Estimated WBGT uses a meteorological approximation (moderate solar load); TWL shown is an indicative screening value. For definitive readings and stop-work decisions, use a calibrated WBGT / TWL heat stress monitor at the work face. This tool supports — never replaces — competent HSE judgement.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CALCULATORS ================= -->
+<section class="pane" id="pane-calc">
+  <div class="grid g2">
+    <div class="card">
+      <div class="kicker">ISO 7243 · Measured</div>
+      <h2>WBGT Calculator</h2>
+      <div class="note">From direct instrument readings (natural wet bulb, globe, dry bulb).</div>
+      <div class="irow">
+        <div class="frow"><label for="c_tnwb">Natural wet bulb T<sub>nwb</sub> °C</label><input type="number" id="c_tnwb" value="28" step="0.1" inputmode="decimal"></div>
+        <div class="frow"><label for="c_tg">Globe T<sub>g</sub> °C</label><input type="number" id="c_tg" value="50" step="0.1" inputmode="decimal"></div>
+      </div>
+      <div class="irow">
+        <div class="frow"><label for="c_tdb">Dry bulb T<sub>a</sub> °C</label><input type="number" id="c_tdb" value="42" step="0.1" inputmode="decimal"></div>
+        <div class="frow"><label for="c_env">Environment</label>
+          <select id="c_env"><option value="out">Outdoor (solar load)</option><option value="in">Indoor / no solar</option></select></div>
+      </div>
+      <button class="btn" onclick="calcWBGTmeasured()">Calculate WBGT</button>
+      <div id="c_wbgtOut" style="margin-top:14px"></div>
+      <div class="divider"></div>
+      <div class="kicker">ACGIH TLV Screening</div>
+      <div class="irow">
+        <div class="frow"><label for="c_work">Workload</label>
+          <select id="c_work"><option value="light">Light</option><option value="moderate" selected>Moderate</option><option value="heavy">Heavy</option><option value="vheavy">Very heavy</option></select></div>
+        <div class="frow"><label for="c_cloth">Clothing adjustment</label>
+          <select id="c_cloth"><option value="0">Coveralls +0</option><option value="0.5">SMS +0.5</option><option value="1">Polyolefin +1</option><option value="3">Double layer +3</option><option value="11">Vapour barrier +11</option></select></div>
+      </div>
+      <div class="frow"><label for="c_accl">Acclimatization</label>
+        <select id="c_accl"><option value="acc">Acclimatized (TLV)</option><option value="unacc">Unacclimatized (Action Limit)</option></select></div>
+      <button class="btn" onclick="calcTLV()">Screen Against TLV</button>
+      <div id="c_tlvOut" style="margin-top:14px"></div>
+    </div>
+
+    <div class="card">
+      <div class="kicker">Brake &amp; Bates method · Gulf standard</div>
+      <h2>Thermal Work Limit (TWL)</h2>
+      <div class="note">Indicative TWL estimate from environmental inputs. TWL is the limiting sustainable metabolic rate (W/m²) — the preferred Gulf index (OSHAD, Aramco, Qatar).</div>
+      <div class="irow">
+        <div class="frow"><label for="t_ta">Dry bulb °C</label><input type="number" id="t_ta" value="42" step="0.5" inputmode="decimal"></div>
+        <div class="frow"><label for="t_rh">Humidity %RH</label><input type="number" id="t_rh" value="35" step="1" inputmode="decimal"></div>
+      </div>
+      <div class="irow">
+        <div class="frow"><label for="t_ws">Wind speed m/s</label><input type="number" id="t_ws" value="1.5" step="0.5" min="0" inputmode="decimal"></div>
+        <div class="frow"><label for="t_sun">Radiant load</label>
+          <select id="t_sun"><option value="full">Full sun</option><option value="partial">Partial shade</option><option value="shade">Shade / indoor</option></select></div>
+      </div>
+      <button class="btn" onclick="calcTWLpane()">Estimate TWL</button>
+      <div id="t_out" style="margin-top:14px"></div>
+      <div class="divider"></div>
+      <div class="twrap"><table>
+        <thead><tr><th>TWL W/m²</th><th>Zone</th><th>Controls</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">≥ 220</td><td><span class="tag" style="background:#EDF7F0;color:#1D6B3D">Unrestricted</span></td><td>Normal work. Routine hydration and self-pacing.</td></tr>
+          <tr><td class="mono">140 – 219</td><td><span class="tag" style="background:#FEF7DC;color:#8A6D00">Acclimatization</span></td><td>No unacclimatized worker alone. Increase supervision, water intake, monitor new workers.</td></tr>
+          <tr><td class="mono">115 – 139</td><td><span class="tag" style="background:#FDF1E7;color:#9A4A15">Buffer</span></td><td>No work alone. Written work-rest regime, active supervision, chilled water at task.</td></tr>
+          <tr><td class="mono">&lt; 115</td><td><span class="tag" style="background:#FBEBEA;color:#8F211B">Withdrawal</span></td><td>Stop continuous work. Emergency / rescue tasks only under strict controls.</td></tr>
+        </tbody></table></div>
+      <div class="disclaimer">TWL here is a screening approximation calibrated to typical Gulf conditions. Definitive TWL requires a calibrated instrument (e.g., Scarlet TWL-1S / heat-stress monitor) measuring DB, WB, GT and wind at the work location.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WORK-REST ================= -->
+<section class="pane" id="pane-plan">
+  <div class="card">
+    <div class="kicker">Planner</div>
+    <h2>Work-Rest Regime &amp; Hydration Planner</h2>
+    <div class="note">Generates an hourly regime from effective WBGT and workload, aligned to ACGIH TLV screening logic.</div>
+    <div class="grid g3">
+      <div class="frow"><label for="p_wbgt">Effective WBGT °C (incl. clothing)</label><input type="number" id="p_wbgt" value="31" step="0.1" inputmode="decimal"></div>
+      <div class="frow"><label for="p_work">Workload</label>
+        <select id="p_work"><option value="light">Light</option><option value="moderate" selected>Moderate</option><option value="heavy">Heavy</option><option value="vheavy">Very heavy</option></select></div>
+      <div class="frow"><label for="p_accl">Acclimatization</label>
+        <select id="p_accl"><option value="acc">Acclimatized</option><option value="unacc">Unacclimatized</option></select></div>
+    </div>
+    <button class="btn amber" onclick="runPlanner()">Generate Regime</button>
+    <div id="p_out" style="margin-top:16px"></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="kicker">Reference</div>
+    <h2>ACGIH Screening Criteria (WBGT<sub>eff</sub> °C)</h2>
+    <div class="twrap"><table>
+      <thead><tr><th>Work in cycle</th><th>Light</th><th>Moderate</th><th>Heavy</th><th>Very heavy</th></tr></thead>
+      <tbody id="tlvTable"></tbody>
+    </table></div>
+    <div class="disclaimer">Upper block: TLV (acclimatized). Lower block: Action Limit (unacclimatized). Add clothing adjustment factor to measured WBGT before comparison. Where criteria are exceeded, conduct physiological monitoring or detailed analysis (ISO 7933 PHS).</div>
+  </div>
+</section>
+
+<!-- ================= GCC COMPLIANCE ================= -->
+<section class="pane" id="pane-gcc">
+  <div class="card" style="margin-bottom:16px">
+    <div class="kicker">Live check</div>
+    <h2>Is a Midday Ban Active Now?</h2>
+    <div class="grid g3" style="align-items:end">
+      <div class="frow"><label for="g_country">Country</label>
+        <select id="g_country">
+          <option value="AE">United Arab Emirates</option><option value="SA">Saudi Arabia</option>
+          <option value="QA">Qatar</option><option value="KW">Kuwait</option>
+          <option value="BH">Bahrain</option><option value="OM">Oman</option>
+        </select></div>
+      <div class="frow"><label for="g_dt">Date &amp; time (site)</label><input type="datetime-local" id="g_dt"></div>
+      <div class="frow"><button class="btn" style="width:100%" onclick="gccCheck()">Check</button></div>
+    </div>
+    <div id="g_out"></div>
+  </div>
+  <div class="twrap" style="background:#fff"><table>
+    <thead><tr><th>Jurisdiction</th><th>Summer working-hours rule</th><th>Period</th><th>Key instruments / notes</th></tr></thead>
+    <tbody>
+      <tr><td><b>UAE</b></td><td>No outdoor work under direct sun / open air <b>12:30–15:00</b></td><td class="mono">15 Jun – 15 Sep</td><td>MoHRE Ministerial Resolution (annual); OSHAD-SF (Abu Dhabi) CoP on Safety in the Heat; TWL-based programs widely mandated by ADNOC group entities.</td></tr>
+      <tr><td><b>Saudi Arabia</b></td><td>No work under direct sunlight <b>12:00–15:00</b></td><td class="mono">15 Jun – 15 Sep</td><td>MHRSD ministerial decision; Aramco CSM &amp; GI heat stress program uses TWL flag conditions.</td></tr>
+      <tr><td><b>Qatar</b></td><td>No outdoor work <b>10:00–15:30</b>; additionally stop work anywhere when <b>WBGT &gt; 32.1 °C</b></td><td class="mono">1 Jun – 15 Sep</td><td>Ministerial Decision No. 17 of 2021 — most protective regime in GCC; mandates annual health checks &amp; risk assessments.</td></tr>
+      <tr><td><b>Kuwait</b></td><td>No outdoor work <b>11:00–16:00</b></td><td class="mono">1 Jun – 31 Aug</td><td>PAM administrative decision.</td></tr>
+      <tr><td><b>Bahrain</b></td><td>No outdoor work <b>12:00–16:00</b></td><td class="mono">Jul – Aug</td><td>MoL ministerial order.</td></tr>
+      <tr><td><b>Oman</b></td><td>No outdoor work <b>12:30–15:30</b></td><td class="mono">1 Jun – 31 Aug</td><td>MoL ministerial decision.</td></tr>
+    </tbody></table></div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <div class="kicker">Standards stack</div>
+      <h2>Framework Alignment</h2>
+      <table>
+        <tbody>
+          <tr><td><b>ISO 7243</b></td><td>WBGT index — screening assessment of heat stress</td></tr>
+          <tr><td><b>ISO 7933</b></td><td>Predicted Heat Strain (PHS) — detailed analytical method when WBGT screening is exceeded</td></tr>
+          <tr><td><b>ACGIH TLV®</b></td><td>WBGT-based TLVs and Action Limits with clothing adjustment factors</td></tr>
+          <tr><td><b>TWL (Brake &amp; Bates)</b></td><td>Limiting sustainable metabolic rate; zone-based controls — Gulf industry standard</td></tr>
+          <tr><td><b>OSHAD-SF</b></td><td>Abu Dhabi Code of Practice — Safety in the Heat program requirements</td></tr>
+          <tr><td><b>NIOSH</b></td><td>Acclimatization scheduling (20% rule), hydration and medical surveillance guidance</td></tr>
+        </tbody></table>
+    </div>
+    <div class="card">
+      <div class="kicker">Program essentials</div>
+      <h2>Employer Duties Checklist</h2>
+      <table><tbody>
+        <tr><td>☐</td><td>Documented heat stress risk assessment reviewed each summer season</td></tr>
+        <tr><td>☐</td><td>Shaded, ventilated (ideally cooled) rest shelters within short walk of work fronts</td></tr>
+        <tr><td>☐</td><td>Cool potable water + electrolyte provision at task locations</td></tr>
+        <tr><td>☐</td><td>Acclimatization program for new / returning workers</td></tr>
+        <tr><td>☐</td><td>Flag / zone communication system and stop-work authority</td></tr>
+        <tr><td>☐</td><td>Trained first aiders, heat illness response plan, medevac arrangements</td></tr>
+        <tr><td>☐</td><td>Summer working-hours compliance records (mandatory display of schedule)</td></tr>
+        <tr><td>☐</td><td>Worker training in language understood (incl. Hindi/Urdu/Tamil/Bengali toolbox talks)</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ACCLIMATIZATION ================= -->
+<section class="pane" id="pane-accl">
+  <div class="grid g2">
+    <div class="card">
+      <div class="kicker">NIOSH schedule builder</div>
+      <h2>Acclimatization Planner</h2>
+      <div class="note">Most Gulf heat casualties occur in a worker's first two weeks. Build a ramp-up schedule.</div>
+      <div class="frow"><label for="a_type">Worker status</label>
+        <select id="a_type">
+          <option value="new">New to heat work (never acclimatized)</option>
+          <option value="return">Returning after ≥1 week absence (leave / illness)</option>
+        </select></div>
+      <div class="frow"><label for="a_start">Start date</label><input type="date" id="a_start"></div>
+      <button class="btn" onclick="buildAccl()">Build Schedule</button>
+      <div id="a_out" style="margin-top:14px"></div>
+    </div>
+    <div class="card">
+      <div class="kicker">Field rules</div>
+      <h2>Acclimatization Principles</h2>
+      <table><tbody>
+        <tr><td><b>Timeframe</b></td><td>Physiological adaptation takes 7–14 days of progressive heat exposure with work.</td></tr>
+        <tr><td><b>Loss</b></td><td>Noticeably reduced after ~1 week away; largely lost after 3–4 weeks. Re-acclimatize after annual leave.</td></tr>
+        <tr><td><b>Buddy rule</b></td><td>Unacclimatized workers never work alone in yellow zone or above.</td></tr>
+        <tr><td><b>Illness</b></td><td>Fever, diarrhoea, vomiting reset the clock — restart ramp-up after recovery.</td></tr>
+        <tr><td><b>Risk factors</b></td><td>Ramadan fasting, poor sleep, certain medications, obesity and cardiovascular conditions all reduce heat tolerance — flag through fitness-to-work screening.</td></tr>
+      </tbody></table>
+      <div class="alertbox info">Supervisors: log each new arrival's day count on the daily heat permit. A worker on Day 3 is not a full-duty worker.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FIRST AID ================= -->
+<section class="pane" id="pane-aid">
+  <div class="grid g2">
+    <div class="card">
+      <div class="kicker">Interactive triage</div>
+      <h2>Heat Illness Decision Tree</h2>
+      <div class="note">For suspected heat illness. When in doubt, treat as heat stroke — it kills in minutes.</div>
+      <div id="faTree"></div>
+      <button class="btn ghost sm" onclick="faReset()" style="margin-top:10px">Restart tree</button>
+    </div>
+    <div class="card">
+      <div class="kicker">Recognition</div>
+      <h2>Spot the Difference</h2>
+      <div class="twrap"><table>
+        <thead><tr><th>Sign</th><th>Heat exhaustion</th><th>Heat stroke ⚠</th></tr></thead>
+        <tbody>
+          <tr><td>Mental state</td><td>Normal or mildly dizzy</td><td><b>Confused, aggressive, staggering, collapsed, fitting</b></td></tr>
+          <tr><td>Skin</td><td>Pale, cool, heavy sweating</td><td>Hot; may be dry <i>or</i> still sweating</td></tr>
+          <tr><td>Core temp</td><td>&lt; 40 °C</td><td>≥ 40 °C</td></tr>
+          <tr><td>Action</td><td>Rest, shade, cool, oral fluids, monitor 30 min</td><td><b>Medical emergency — aggressive cooling + medevac now</b></td></tr>
+        </tbody></table></div>
+      <div class="alertbox bad" style="margin-top:14px"><b>Golden rule: cool first, transport second.</b> Strip outer clothing, drench with water, fan continuously, ice packs to neck / armpits / groin. Every minute above 40 °C core damages organs.</div>
+      <div class="alertbox warn"><b>Never</b> give fluids to a confused or unconscious casualty. Never leave them alone. Never send a "dizzy" worker to rest unobserved in a cabin.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= AI TOOLS ================= -->
+<section class="pane" id="pane-ai">
+  <div class="grid g2">
+    <div class="card">
+      <div class="kicker">AI generator</div>
+      <h2>Toolbox Talk Builder</h2>
+      <div class="note">Generates a 5-minute heat stress toolbox talk from today's conditions on the Dashboard.</div>
+      <div class="frow"><label for="tt_topic">Focus (optional)</label><input id="tt_topic" placeholder="e.g., confined space entry during summer, scaffolders at height"></div>
+      <div class="frow"><label for="tt_lang">Language</label>
+        <select id="tt_lang"><option>English</option><option>Simple English (ESL crews)</option><option>Hindi</option><option>Urdu</option><option>Tamil</option><option>Bengali</option><option>Arabic</option></select></div>
+      <button class="btn amber" id="ttBtn" onclick="genToolbox()">Generate Toolbox Talk</button>
+      <div class="ai-out" id="ttOut" style="margin-top:12px">Output appears here.</div>
+    </div>
+    <div class="card">
+      <div class="kicker">AI advisor</div>
+      <h2>Task Heat Risk Assessment</h2>
+      <div class="note">Describe the task — the advisor combines it with current site conditions to produce a structured heat stress risk assessment with controls.</div>
+      <div class="frow"><label for="ra_task">Task description</label>
+        <textarea id="ra_task" rows="4" placeholder="e.g., Flange breaking on live flare KO drum line, 2 fitters + 1 fire watch, full FRC coveralls, work at grade, no shade, expected duration 3 hours"></textarea></div>
+      <button class="btn amber" id="raBtn" onclick="genRA()">Generate Risk Assessment</button>
+      <div class="ai-out" id="raOut" style="margin-top:12px">Output appears here.</div>
+    </div>
+  </div>
+  <div class="disclaimer">AI outputs are drafts for review by a competent person. Configure your API key under Settings. Your key stays in this browser only.</div>
+</section>
+
+<!-- ================= PERMIT ================= -->
+<section class="pane" id="pane-permit">
+  <div class="card no-print">
+    <div class="kicker">Daily control document</div>
+    <h2>Heat Stress Work Permit / Daily Checklist</h2>
+    <div class="grid g3">
+      <div class="frow"><label for="pm_site">Site / area</label><input id="pm_site" placeholder="e.g., Hazar Plant — Unit 300"></div>
+      <div class="frow"><label for="pm_sup">Supervisor</label><input id="pm_sup" placeholder="Name"></div>
+      <div class="frow"><label for="pm_crew">Crew size</label><input id="pm_crew" type="number" min="1" value="6"></div>
+    </div>
+    <div class="frow"><label for="pm_task">Work description</label><input id="pm_task" placeholder="Task summary"></div>
+    <button class="btn amber" onclick="buildPermit()">Build Permit From Dashboard Conditions</button>
+    <button class="btn ghost" onclick="window.print()">Print / PDF</button>
+  </div>
+  <div class="permit-doc permit-print-keep card" id="permitDoc" style="display:none"></div>
+</section>
+
+<!-- ================= SETTINGS ================= -->
+<section class="pane" id="pane-set">
+  <div class="card" style="max-width:640px">
+    <div class="kicker">AI configuration</div>
+    <h2>API Settings</h2>
+    <div class="note">Bring-your-own-key model. The key is stored only in this browser (localStorage) and sent directly to the provider.</div>
+    <div class="frow"><label for="s_provider">Provider</label>
+      <select id="s_provider"><option value="openai">OpenAI (api.openai.com)</option><option value="anthropic">Anthropic (api.anthropic.com)</option></select></div>
+    <div class="frow"><label for="s_key">API key</label><input id="s_key" type="password" placeholder="sk-..."><span class="hint">Never share your key. Revoke it at your provider dashboard if exposed.</span></div>
+    <div class="frow"><label for="s_model">Model</label><input id="s_model" placeholder="gpt-4o-mini or claude-sonnet-4-6"></div>
+    <button class="btn" onclick="saveSettings()">Save Settings</button>
+    <div id="s_msg" style="margin-top:10px"></div>
+  </div>
+</section>
+
+</main>
+<footer>Risk2Safe HeatGuard · Screening &amp; awareness tool · Aligned to ISO 7243, ACGIH TLV®, TWL zones, OSHAD-SF and GCC summer working-hour rules · Not a substitute for calibrated instruments, medical advice or site HSE procedures.</footer>
+<script>
+/* ================= core data ================= */
+// ACGIH screening criteria (WBGT-eff °C). Rows: % work in cycle. [light, moderate, heavy, vheavy]; null = not permitted at screening level
+const TLV = {
+  acc: {
+    "75–100%": [31.0, 28.0, 25.0, null],
+    "50–75%":  [31.0, 29.0, 27.5, null],
+    "25–50%":  [32.0, 30.0, 29.0, 28.0],
+    "0–25%":   [32.5, 31.5, 30.5, 30.0]
+  },
+  unacc: {
+    "75–100%": [28.0, 25.0, 22.5, null],
+    "50–75%":  [28.5, 26.0, 24.0, null],
+    "25–50%":  [29.5, 27.0, 25.5, 24.5],
+    "0–25%":   [30.0, 29.0, 28.0, 27.0]
+  }
+};
+const WORK_IDX = {light:0, moderate:1, heavy:2, vheavy:3};
+const WORK_LABEL = {light:"Light", moderate:"Moderate", heavy:"Heavy", vheavy:"Very heavy"};
+const CYCLES = [
+  {key:"75–100%", wr:"Continuous (60 min work)", frac:1.0},
+  {key:"50–75%",  wr:"45 min work : 15 min rest", frac:0.75},
+  {key:"25–50%",  wr:"30 min work : 30 min rest", frac:0.5},
+  {key:"0–25%",   wr:"15 min work : 45 min rest", frac:0.25}
+];
+const FLAGS = [
+  {name:"GREEN",  color:"var(--flag-green)",  max:28,  directive:"Normal work with routine heat controls. Water every 20 min, self-pacing, watch new workers."},
+  {name:"YELLOW", color:"var(--flag-yellow)", max:30,  directive:"Heightened alert. Enforce scheduled rest breaks in shade, chilled water at task, buddy system for unacclimatized workers."},
+  {name:"ORANGE", color:"var(--flag-orange)", max:32,  directive:"Restricted work. Written work-rest regime mandatory, supervisor at work front, reschedule heavy tasks to cooler hours."},
+  {name:"RED",    color:"var(--flag-red)",    max:34,  directive:"Severe. Essential work only under specific TRA. Heavy/very-heavy work suspended. Continuous supervision, cooling stations active."},
+  {name:"BLACK",  color:"var(--flag-black)",  max:99,  directive:"STOP WORK. Non-emergency outdoor work suspended. Emergency tasks only with dedicated rescue standby and medical support."}
+];
+const GCC = {
+  AE:{name:"United Arab Emirates", from:[6,15], to:[9,15], h1:12.5, h2:15,   rule:"No work under direct sun / open air 12:30–15:00 (MoHRE)"},
+  SA:{name:"Saudi Arabia",         from:[6,15], to:[9,15], h1:12,   h2:15,   rule:"No work under direct sunlight 12:00–15:00 (MHRSD)"},
+  QA:{name:"Qatar",                from:[6,1],  to:[9,15], h1:10,   h2:15.5, rule:"No outdoor work 10:00–15:30; stop work anywhere if WBGT > 32.1 °C (MD 17/2021)"},
+  KW:{name:"Kuwait",               from:[6,1],  to:[8,31], h1:11,   h2:16,   rule:"No outdoor work 11:00–16:00 (PAM)"},
+  BH:{name:"Bahrain",              from:[7,1],  to:[8,31], h1:12,   h2:16,   rule:"No outdoor work 12:00–16:00 (MoL)"},
+  OM:{name:"Oman",                 from:[6,1],  to:[8,31], h1:12.5, h2:15.5, rule:"No outdoor work 12:30–15:30 (MoL)"}
+};
+
+/* ================= storage (guarded) ================= */
+function lsGet(k){ try{ return localStorage.getItem(k);}catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v);}catch(e){} }
+
+/* ================= psychrometrics ================= */
+function vapourPressure(ta, rh){ // hPa
+  return (rh/100) * 6.105 * Math.exp((17.27*ta)/(237.7+ta));
+}
+// Psychrometric wet bulb — Stull (2011)
+function wetBulbStull(ta, rh){
+  return ta*Math.atan(0.151977*Math.sqrt(rh+8.313659)) + Math.atan(ta+rh)
+       - Math.atan(rh-1.676331) + 0.00391838*Math.pow(rh,1.5)*Math.atan(0.023101*rh)
+       - 4.686035;
+}
+// Estimated WBGT: Stull Twb → natural wet bulb & globe estimates → ISO 7243 formula
+function wbgtEstimate(ta, rh, sun, ws){
+  const twb = wetBulbStull(ta, rh);
+  const wind = Math.max(ws, 0.3);
+  const windDamp = 1/(1 + 0.35*wind);
+  const radNwb = sun==="full" ? 2.5 : sun==="partial" ? 1.2 : 0.2;   // radiant add to nwb
+  const radTg  = sun==="full" ? 16  : sun==="partial" ? 8   : 1;      // solar globe increment, still air
+  const tnwb = twb + radNwb*windDamp;
+  const tg = ta + radTg*windDamp;
+  const w = sun==="shade" ? 0.7*tnwb + 0.3*tg : 0.7*tnwb + 0.2*tg + 0.1*ta;
+  return Math.round(w*10)/10;
+}
+// Indicative TWL screening estimate (anchored to published TWL/WBGT field correlations, Gulf conditions)
+function twlEstimate(wbgt, ws, sun){
+  let twl = 250 - 18*(wbgt - 26);
+  twl += Math.max(-15, Math.min((ws-1)*15, 60));   // wind is the dominant reliever
+  if (sun === "shade") twl += 20; else if (sun === "partial") twl += 10;
+  return Math.round(Math.max(30, Math.min(350, twl)));
+}
+function twlZone(twl){
+  if (twl >= 220) return {name:"Unrestricted", cls:"ok"};
+  if (twl >= 140) return {name:"Acclimatization", cls:"warn"};
+  if (twl >= 115) return {name:"Buffer", cls:"warn"};
+  return {name:"Withdrawal", cls:"bad"};
+}
+function flagFor(wbgtEff){
+  for (const f of FLAGS) if (wbgtEff < f.max) return f;
+  return FLAGS[FLAGS.length-1];
+}
+// Max permissible work fraction for workload & effective WBGT
+function allowedCycle(wbgtEff, work, accl){
+  const idx = WORK_IDX[work];
+  for (const c of CYCLES){
+    const lim = TLV[accl][c.key][idx];
+    if (lim !== null && wbgtEff <= lim) return c;
+  }
+  return null;
+}
+
+/* ================= tabs & clock ================= */
+document.getElementById("tabbar").addEventListener("click", e=>{
+  const b = e.target.closest(".tab"); if(!b) return;
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".pane").forEach(p=>p.classList.remove("active"));
+  b.classList.add("active");
+  document.getElementById("pane-"+b.dataset.pane).classList.add("active");
+});
+function tickClock(){
+  const n = new Date();
+  document.getElementById("hdClock").innerHTML =
+    n.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"}) +
+    "<br><b>" + n.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"}) + "</b>";
+}
+setInterval(tickClock, 30000); tickClock();
+
+/* ================= dashboard ================= */
+let DASH = null;
+function runDashboard(){
+  const ta = +document.getElementById("d_ta").value;
+  const rh = +document.getElementById("d_rh").value;
+  const ws = +document.getElementById("d_ws").value;
+  const sun = document.getElementById("d_sun").value;
+  const work = document.getElementById("d_work").value;
+  const cav = +document.getElementById("d_cloth").value;
+  const accl = document.getElementById("d_accl").value;
+  if (!isFinite(ta) || !isFinite(rh) || rh<=0){ alert("Enter valid temperature and humidity."); return; }
+
+  const wbgt = wbgtEstimate(ta, rh, sun, ws);
+  const wbgtEff = Math.round((wbgt + cav)*10)/10;
+  const twl = twlEstimate(wbgt, ws, sun);
+  const zone = twlZone(twl);
+  const flag = flagFor(wbgtEff);
+  const cyc = allowedCycle(wbgtEff, work, accl);
+  DASH = {ta,rh,ws,sun,work,cav,accl,wbgt,wbgtEff,twl,zone,flag,cyc};
+
+  document.getElementById("gWbgt").innerHTML = wbgt.toFixed(1)+"<small> °C</small>";
+  document.getElementById("gWbgtEff").innerHTML = wbgtEff.toFixed(1)+"<small> °C</small>";
+  document.getElementById("gTwl").innerHTML = twl+"<small> W/m²</small>";
+  document.getElementById("gWr").textContent = cyc ? cyc.wr.replace(" work","").replace(" rest","") : "STOP";
+  document.getElementById("flagSwatch").style.background = flag.color;
+  document.getElementById("flagName").textContent = flag.name + " FLAG";
+  document.getElementById("gaugeSub").textContent =
+    WORK_LABEL[work] + " work · " + (accl==="acc"?"acclimatized":"UNACCLIMATIZED") + " crew · clothing +" + cav + " °C";
+
+  // needle position: map WBGT-eff 25→36 across 4%→96%
+  const pct = Math.max(4, Math.min(96, 4 + (wbgtEff-25)/(36-25)*92));
+  document.getElementById("needle").style.left = pct + "%";
+  document.getElementById("needleVal").textContent = wbgtEff.toFixed(1) + " °C";
+
+  let dir = "<b>" + flag.name + " flag.</b> " + flag.directive;
+  dir += cyc
+    ? " Regime for " + WORK_LABEL[work].toLowerCase() + " work: <b>" + cyc.wr + "</b> per hour."
+    : " <b>" + WORK_LABEL[work] + " work exceeds screening criteria even at 15:45 — suspend, re-engineer the task, or apply detailed analysis (ISO 7933) with physiological monitoring.</b>";
+  if (zone.name === "Withdrawal") dir += " TWL is in the <b>withdrawal zone</b> — emergency tasks only.";
+  document.getElementById("gDirective").innerHTML = dir;
+
+  // hydration
+  const rate = work==="light" ? "≈ 750 mL/hr (250 mL every 20 min)"
+             : work==="moderate" ? "≈ 1 L/hr (250 mL every 15 min)"
+             : "up to 1 L/hr (250 mL every 15 min) — do not exceed";
+  document.getElementById("hydroOut").innerHTML =
+    "<div class='readout' style='font-size:22px;margin-bottom:6px'>" + rate + "</div>" +
+    "<ul style='margin-left:18px;font-size:13.5px'>" +
+    "<li>Cool water (10–15 °C) + electrolyte supplementation for shifts &gt; 2 hrs sweating</li>" +
+    "<li>Daily ceiling ≈ 12 L — over-drinking risks hyponatraemia</li>" +
+    "<li>Urine check: pale straw = OK; dark = stop, rehydrate before resuming</li>" +
+    "<li>Pre-shift hydration brief; no energy drinks as fluid replacement</li></ul>";
+  banStatus();
+}
+
+function banStatus(){
+  const cc = document.getElementById("d_country").value;
+  const r = gccEval(cc, new Date());
+  document.getElementById("banOut").innerHTML = r.html;
+}
+function gccEval(cc, dt){
+  const c = GCC[cc];
+  const m = dt.getMonth()+1, d = dt.getDate();
+  const afterStart = (m > c.from[0]) || (m === c.from[0] && d >= c.from[1]);
+  const beforeEnd  = (m < c.to[0])   || (m === c.to[0]   && d <= c.to[1]);
+  const inSeason = afterStart && beforeEnd;
+  const hr = dt.getHours() + dt.getMinutes()/60;
+  const inWindow = hr >= c.h1 && hr < c.h2;
+  const fmt = h => String(Math.floor(h)).padStart(2,"0") + ":" + String(Math.round((h%1)*60)).padStart(2,"0");
+  let html;
+  if (inSeason && inWindow)
+    html = "<div class='alertbox bad'><b>BAN ACTIVE NOW — " + c.name + ".</b> " + c.rule + ". Outdoor work in the sun must stop until " + fmt(c.h2) + ".</div>";
+  else if (inSeason)
+    html = "<div class='alertbox warn'><b>Summer rules in force — " + c.name + ".</b> " + c.rule + ". Ban window today: " + fmt(c.h1) + "–" + fmt(c.h2) + ".</div>";
+  else
+    html = "<div class='alertbox ok'><b>Outside statutory summer period — " + c.name + ".</b> " + c.rule + " applies " + c.from[1] + "/" + c.from[0] + " to " + c.to[1] + "/" + c.to[0] + ". Heat risk controls still apply whenever conditions demand.</div>";
+  return {inSeason, inWindow, html};
+}
+
+/* ================= calculators pane ================= */
+let LAST_WBGT = null;
+function calcWBGTmeasured(){
+  const tnwb = +document.getElementById("c_tnwb").value;
+  const tg = +document.getElementById("c_tg").value;
+  const tdb = +document.getElementById("c_tdb").value;
+  const env = document.getElementById("c_env").value;
+  const w = env==="out" ? 0.7*tnwb + 0.2*tg + 0.1*tdb : 0.7*tnwb + 0.3*tg;
+  LAST_WBGT = Math.round(w*100)/100;
+  document.getElementById("c_wbgtOut").innerHTML =
+    "<div class='readout'>" + LAST_WBGT.toFixed(2) + "<small> °C WBGT</small></div>" +
+    "<div class='hint mono'>" + (env==="out" ? "WBGT = 0.7·Tnwb + 0.2·Tg + 0.1·Ta" : "WBGT = 0.7·Tnwb + 0.3·Tg") + "</div>";
+}
+function calcTLV(){
+  if (LAST_WBGT === null){ calcWBGTmeasured(); }
+  const work = document.getElementById("c_work").value;
+  const cav = +document.getElementById("c_cloth").value;
+  const accl = document.getElementById("c_accl").value;
+  const eff = Math.round((LAST_WBGT + cav)*10)/10;
+  const cyc = allowedCycle(eff, work, accl);
+  const label = accl==="acc" ? "TLV (acclimatized)" : "Action Limit (unacclimatized)";
+  let html = "<div class='readout' style='font-size:24px'>WBGT<sub>eff</sub> " + eff.toFixed(1) + "<small> °C</small></div>";
+  if (cyc){
+    const lim = TLV[accl][cyc.key][WORK_IDX[work]];
+    html += "<div class='alertbox " + (cyc.frac===1?"ok":"warn") + "'><b>Permitted:</b> " + cyc.wr + " for " +
+      WORK_LABEL[work].toLowerCase() + " work (" + label + " " + lim.toFixed(1) + " °C at " + cyc.key + " work).</div>";
+  } else {
+    html += "<div class='alertbox bad'><b>Exceeds screening criteria at all work-rest ratios.</b> Suspend the task, reduce metabolic load / add engineering controls, or proceed only under detailed analysis (ISO 7933 PHS) with physiological monitoring.</div>";
+  }
+  document.getElementById("c_tlvOut").innerHTML = html;
+}
+function calcTWLpane(){
+  const ta=+document.getElementById("t_ta").value, rh=+document.getElementById("t_rh").value,
+        ws=+document.getElementById("t_ws").value, sun=document.getElementById("t_sun").value;
+  const wbgt = wbgtEstimate(ta,rh,sun,ws);
+  const twl = twlEstimate(wbgt,ws,sun);
+  const z = twlZone(twl);
+  document.getElementById("t_out").innerHTML =
+    "<div class='readout'>" + twl + "<small> W/m² TWL</small></div>" +
+    "<div class='hint'>Derived from est. WBGT " + wbgt.toFixed(1) + " °C · wind " + ws + " m/s</div>" +
+    "<div class='alertbox " + z.cls + "'><b>" + z.name + " zone.</b> Apply the controls in the table below.</div>";
+}
+
+/* ================= planner ================= */
+function buildTLVtable(){
+  const tb = document.getElementById("tlvTable");
+  let html = "<tr><td colspan='5' style='background:var(--ink-2);color:#fff;font-weight:600'>TLV — Acclimatized</td></tr>";
+  for (const c of CYCLES){
+    const r = TLV.acc[c.key];
+    html += "<tr><td><b>" + c.key + "</b><br><span class='hint'>" + c.wr + "</span></td>" +
+      r.map(v=>"<td class='mono'>"+(v===null?"—":v.toFixed(1))+"</td>").join("") + "</tr>";
+  }
+  html += "<tr><td colspan='5' style='background:var(--ink-2);color:#fff;font-weight:600'>Action Limit — Unacclimatized</td></tr>";
+  for (const c of CYCLES){
+    const r = TLV.unacc[c.key];
+    html += "<tr><td><b>" + c.key + "</b><br><span class='hint'>" + c.wr + "</span></td>" +
+      r.map(v=>"<td class='mono'>"+(v===null?"—":v.toFixed(1))+"</td>").join("") + "</tr>";
+  }
+  tb.innerHTML = html;
+}
+function runPlanner(){
+  const eff = +document.getElementById("p_wbgt").value;
+  const work = document.getElementById("p_work").value;
+  const accl = document.getElementById("p_accl").value;
+  const cyc = allowedCycle(eff, work, accl);
+  const flag = flagFor(eff);
+  let html = "<div class='flagchip' style='background:var(--surface);border-color:var(--line);color:var(--txt);display:inline-flex;margin-bottom:12px'>" +
+    "<span class='swatch' style='background:" + flag.color + "'></span><span class='fname'>" + flag.name + " FLAG</span></div>";
+  if (cyc){
+    html += "<div class='alertbox " + (cyc.frac===1?"ok":"warn") + "'><b>Hourly regime: " + cyc.wr + "</b> for " + WORK_LABEL[work].toLowerCase() + " work (" + (accl==="acc"?"acclimatized":"unacclimatized") + ").</div>";
+    html += "<ul style='margin-left:18px;font-size:13.5px'>" +
+      "<li>Rest = shaded / cooled shelter, seated, with fluids — walking to the shelter counts as work.</li>" +
+      "<li>Drink 250 mL each rest break minimum; supervisor verifies intake, not just availability.</li>" +
+      "<li>Rotate crews on the regime — do not bank rest to extend work periods.</li>" +
+      "<li>Re-assess whenever conditions change ≥ 1 °C WBGT or the task's metabolic load changes.</li></ul>";
+  } else {
+    html += "<div class='alertbox bad'><b>No compliant work-rest ratio exists at this workload.</b> Options: reschedule to cooler hours, mechanize / reduce metabolic rate, add shade or spot cooling, or apply ISO 7933 detailed analysis with medical monitoring.</div>";
+  }
+  document.getElementById("p_out").innerHTML = html;
+}
+
+/* ================= GCC pane ================= */
+function gccCheck(){
+  const cc = document.getElementById("g_country").value;
+  const v = document.getElementById("g_dt").value;
+  const dt = v ? new Date(v) : new Date();
+  document.getElementById("g_out").innerHTML = gccEval(cc, dt).html;
+}
+
+/* ================= acclimatization ================= */
+function buildAccl(){
+  const type = document.getElementById("a_type").value;
+  const sv = document.getElementById("a_start").value;
+  const start = sv ? new Date(sv+"T00:00:00") : new Date();
+  const plan = type==="new" ? [20,40,60,80,100] : [50,60,80,100];
+  let rows = "";
+  plan.forEach((p,i)=>{
+    const d = new Date(start); d.setDate(d.getDate()+i);
+    rows += "<tr><td><b>Day " + (i+1) + "</b><br><span class='hint'>" +
+      d.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"}) + "</span></td>" +
+      "<td class='mono'>" + p + " %</td>" +
+      "<td>" + (p<100 ? "Max " + p + "% of normal heat-exposure duration; lighter duties for the balance; buddy supervision; extra hydration checks." : "Full duties — continue routine monitoring.") + "</td></tr>";
+  });
+  document.getElementById("a_out").innerHTML =
+    "<div class='twrap'><table><thead><tr><th>Day</th><th>Heat exposure</th><th>Controls</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
+    "<div class='alertbox info' style='margin-top:10px'>Record the schedule on the daily heat permit. If the worker misses a day through illness or absence, hold at the previous step; if absent ≥ 1 week, restart as “returning”.</div>";
+}
+
+/* ================= first aid tree ================= */
+const FA_STEPS = {
+  start:{q:"Is the casualty confused, aggressive, staggering, collapsed, fitting, or unresponsive?",
+    yes:"stroke", no:"q2"},
+  q2:{q:"Do they feel very hot to touch, or has a measured temperature reached 39 °C or above?",
+    yes:"stroke", no:"q3"},
+  q3:{q:"Are they dizzy, nauseous, headachy, cramping, or sweating heavily with pale clammy skin?",
+    yes:"exhaustion", no:"q4"},
+  q4:{q:"Painful muscle cramps only, mentally normal, otherwise well?",
+    yes:"cramps", no:"minor"}
+};
+const FA_OUT = {
+  stroke:`<div class="fa-outcome emergency"><h3>⚠ Treat as HEAT STROKE — medical emergency</h3>
+    <b>Cool first, transport second. Act within minutes.</b>
+    <ul><li>Call emergency response / site medic NOW — state "suspected heat stroke".</li>
+    <li>Move to shade. Remove outer clothing and boots.</li>
+    <li>Drench with water head-to-toe; fan continuously. Ice packs to neck, armpits, groin. Immersion/tarp cooling if available.</li>
+    <li>Unresponsive + breathing → recovery position. Not breathing → CPR.</li>
+    <li><b>No fluids by mouth</b> if confused or drowsy.</li>
+    <li>Continue aggressive cooling until medics take over — do not stop for transport preparation.</li></ul></div>`,
+  exhaustion:`<div class="fa-outcome caution"><h3>Heat exhaustion — remove from heat now</h3>
+    <ul><li>Stop work. Walk (do not let them walk alone) to a cooled rest area; lie down, legs raised.</li>
+    <li>Loosen clothing; cool with wet cloths and fanning.</li>
+    <li>Sip cool water / electrolyte drink — about 1 L over the first hour.</li>
+    <li>Observe continuously for 30 minutes. <b>Any confusion, vomiting, or no improvement → treat as heat stroke.</b></li>
+    <li>No return to heat work same shift. Record as an incident; review controls that let it happen.</li></ul></div>`,
+  cramps:`<div class="fa-outcome caution"><h3>Heat cramps</h3>
+    <ul><li>Rest in shade; gentle stretching of the affected muscle.</li>
+    <li>Electrolyte drink (not plain water alone).</li>
+    <li>No return to heavy work until cramps fully resolve and fluids replaced.</li>
+    <li>Cramps signal salt depletion — check the crew's electrolyte provision.</li></ul></div>`,
+  minor:`<div class="fa-outcome caution"><h3>Monitor — possible early heat strain</h3>
+    <ul><li>Rest break in shade with fluids as a precaution.</li>
+    <li>Check: heat rash, recent illness, medication, fasting, poor sleep, day-count of acclimatization.</li>
+    <li>Brief the buddy and supervisor to keep watch. Reassess in 15 minutes; escalate if any red-flag sign appears.</li></ul></div>`
+};
+let faPos = "start";
+function faRender(){
+  const el = document.getElementById("faTree");
+  if (FA_OUT[faPos]){ el.innerHTML = FA_OUT[faPos]; return; }
+  const s = FA_STEPS[faPos];
+  el.innerHTML = `<div class="fa-step"><div class="fa-q">${s.q}</div>
+    <div class="fa-btns"><button class="btn bad" style="background:var(--bad)" onclick="faGo('${s.yes}')">YES</button>
+    <button class="btn ghost" onclick="faGo('${s.no}')">NO</button></div></div>`;
+}
+function faGo(next){ faPos = next; faRender(); }
+function faReset(){ faPos = "start"; faRender(); }
+
+/* ================= AI ================= */
+function aiSettings(){
+  return {
+    provider: lsGet("hg_provider") || "openai",
+    key: lsGet("hg_key") || "",
+    model: lsGet("hg_model") || ""
+  };
+}
+function saveSettings(){
+  lsSet("hg_provider", document.getElementById("s_provider").value);
+  lsSet("hg_key", document.getElementById("s_key").value.trim());
+  lsSet("hg_model", document.getElementById("s_model").value.trim());
+  document.getElementById("s_msg").innerHTML = "<div class='alertbox ok'>Saved to this browser.</div>";
+}
+function loadSettings(){
+  const s = aiSettings();
+  document.getElementById("s_provider").value = s.provider;
+  document.getElementById("s_key").value = s.key;
+  document.getElementById("s_model").value = s.model;
+}
+function condSummary(){
+  if (!DASH) return "Site conditions not yet assessed (assume UAE summer: ~42 °C, 35 %RH, full sun).";
+  return `Air temp ${DASH.ta} °C, RH ${DASH.rh} %, wind ${DASH.ws} m/s, ${DASH.sun} exposure. ` +
+    `Estimated WBGT ${DASH.wbgt} °C (effective ${DASH.wbgtEff} °C with clothing +${DASH.cav} °C). ` +
+    `Indicative TWL ${DASH.twl} W/m² (${DASH.zone.name} zone). Flag: ${DASH.flag.name}. ` +
+    `Workload ${WORK_LABEL[DASH.work]}, crew ${DASH.accl === "acc" ? "acclimatized" : "NOT acclimatized"}. ` +
+    `Permitted regime: ${DASH.cyc ? DASH.cyc.wr : "work exceeds screening criteria"}.`;
+}
+async function callAI(prompt, outEl, btnEl){
+  const s = aiSettings();
+  if (!s.key){
+    outEl.innerHTML = "No API key configured. Open <b>Settings</b> and add your key (stored in this browser only).";
+    return;
+  }
+  const model = s.model || (s.provider === "anthropic" ? "claude-sonnet-4-6" : "gpt-4o-mini");
+  btnEl.disabled = true;
+  outEl.innerHTML = "<span class='spinner'></span>Generating…";
+  try{
+    let text;
+    if (s.provider === "anthropic"){
+      const r = await fetch("https://api.anthropic.com/v1/messages", {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "x-api-key": s.key,
+          "anthropic-version":"2023-06-01",
+          "anthropic-dangerous-direct-browser-access":"true"
+        },
+        body: JSON.stringify({model, max_tokens:1500, messages:[{role:"user", content:prompt}]})
+      });
+      const d = await r.json();
+      if (d.error) throw new Error(d.error.message);
+      text = (d.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
+    } else {
+      const r = await fetch("https://api.openai.com/v1/chat/completions", {
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer "+s.key},
+        body: JSON.stringify({model, messages:[{role:"user", content:prompt}], max_tokens:1500})
+      });
+      const d = await r.json();
+      if (d.error) throw new Error(d.error.message);
+      text = d.choices[0].message.content;
+    }
+    outEl.textContent = text;
+  } catch(err){
+    outEl.innerHTML = "<span style='color:var(--bad)'>Request failed: " + err.message + "</span><br>Check the key, model name, and network, then retry.";
+  } finally {
+    btnEl.disabled = false;
+  }
+}
+function genToolbox(){
+  const topic = document.getElementById("tt_topic").value.trim();
+  const lang = document.getElementById("tt_lang").value;
+  const prompt =
+`You are a senior GCC oil & gas HSE advisor. Write a 5-minute heat stress toolbox talk for field workers.
+Language: ${lang}. Keep sentences short and spoken-style; use simple vocabulary suitable for a mixed-nationality crew.
+Today's site conditions: ${condSummary()}
+${topic ? "Task focus: " + topic + "." : ""}
+Structure: 1) One-line hook about today's flag condition, 2) Three key hazards today, 3) Exactly what the crew must do (work-rest regime, hydration quantity/frequency, buddy checks), 4) Early warning signs to report immediately, 5) One question to ask the crew to confirm understanding. End with the stop-work authority reminder. No preamble, output only the talk.`;
+  callAI(prompt, document.getElementById("ttOut"), document.getElementById("ttBtn"));
+}
+function genRA(){
+  const task = document.getElementById("ra_task").value.trim();
+  if (!task){ document.getElementById("raOut").textContent = "Describe the task first."; return; }
+  const prompt =
+`You are a senior process safety / HSE engineer preparing a heat stress task risk assessment for a GCC oil & gas facility, aligned to ISO 7243, ACGIH TLV, TWL zone controls and local summer working-hour rules.
+Site conditions: ${condSummary()}
+Task: ${task}
+Produce a structured assessment with these sections:
+1. TASK & EXPOSURE PROFILE (metabolic load class, clothing factor, duration, radiant sources beyond solar e.g. hot surfaces/flare)
+2. HEAT RISK EVALUATION (compare against the screening data above; state residual concern)
+3. CONTROLS — hierarchy of controls order: eliminate/reschedule, engineering (shade, ventilation, spot cooling), administrative (work-rest regime with specific minutes, hydration schedule, acclimatization checks, supervision/buddy), PPE considerations (FRC breathability, cooling vests)
+4. TRIGGERS & STOP CRITERIA (specific WBGT/TWL/flag values and symptoms that stop the task)
+5. EMERGENCY ARRANGEMENTS (heat stroke response, cooling means at task, medevac)
+Be specific and quantitative. Plain text, numbered sections, no markdown symbols.`;
+  callAI(prompt, document.getElementById("raOut"), document.getElementById("raBtn"));
+}
+
+/* ================= permit ================= */
+function buildPermit(){
+  if (!DASH){ alert("Run the Dashboard assessment first — the permit pulls today's conditions from it."); return; }
+  const site = document.getElementById("pm_site").value || "____________________";
+  const sup  = document.getElementById("pm_sup").value || "____________________";
+  const crew = document.getElementById("pm_crew").value || "___";
+  const task = document.getElementById("pm_task").value || "____________________";
+  const n = new Date();
+  const r = gccEval(document.getElementById("d_country").value, n);
+  const checks = [
+    "Cooled/shaded rest shelter available within 3 min walk of work front",
+    "Cool drinking water + electrolytes at task location; intake being verified",
+    "Work-rest regime above briefed to crew and being enforced",
+    "New/returning workers identified; acclimatization day-count recorded",
+    "Buddy system in place; no lone working in Yellow flag or above",
+    "First aider identified; cooling means (water, ice, fan/tarp) at hand",
+    "Emergency contact & medevac route confirmed for this location",
+    "Statutory midday-break compliance confirmed for today's schedule",
+    "Toolbox talk on heat delivered in language(s) understood",
+    "Re-assessment trigger set (conditions change / 2-hour interval)"
+  ];
+  document.getElementById("permitDoc").style.display = "block";
+  document.getElementById("permitDoc").innerHTML = `
+    <h1>Daily Heat Stress Work Permit</h1>
+    <div class="prow"><b>Date / time issued</b><span>${n.toLocaleString()}</span></div>
+    <div class="prow"><b>Site / area</b><span>${site}</span></div>
+    <div class="prow"><b>Work description</b><span>${task}</span></div>
+    <div class="prow"><b>Supervisor</b><span>${sup}</span></div>
+    <div class="prow"><b>Crew size</b><span>${crew}</span></div>
+    <h3>Conditions at issue</h3>
+    <div class="prow"><b>Air / RH / wind</b><span class="mono">${DASH.ta} °C · ${DASH.rh} % · ${DASH.ws} m/s (${DASH.sun})</span></div>
+    <div class="prow"><b>WBGT est. / effective</b><span class="mono">${DASH.wbgt} °C / ${DASH.wbgtEff} °C (clothing +${DASH.cav} °C)</span></div>
+    <div class="prow"><b>TWL (indicative)</b><span class="mono">${DASH.twl} W/m² — ${DASH.zone.name} zone</span></div>
+    <div class="prow"><b>Flag condition</b><span><b>${DASH.flag.name}</b></span></div>
+    <div class="prow"><b>Workload / crew status</b><span>${WORK_LABEL[DASH.work]} · ${DASH.accl==="acc"?"Acclimatized":"NOT acclimatized"}</span></div>
+    <div class="prow"><b>Mandated regime</b><span><b>${DASH.cyc ? DASH.cyc.wr + " per hour" : "WORK NOT PERMITTED at this workload — see planner"}</b></span></div>
+    <div class="prow"><b>Statutory status</b><span>${r.inSeason ? (r.inWindow ? "MIDDAY BAN ACTIVE at issue time" : "Summer rules in force — observe ban window") : "Outside statutory summer period"}</span></div>
+    <h3>Pre-start verification (supervisor initials each)</h3>
+    ${checks.map(c=>`<div class="prow"><span>☐ &nbsp;${c}</span><span style="min-width:60px;border-bottom:1px solid #999">&nbsp;</span></div>`).join("")}
+    <h3>Validity</h3>
+    <div class="prow"><span>Permit valid for this shift only. Void immediately upon: flag escalation, WBGT rise ≥ 1 °C, statutory ban window entry, or any heat illness sign in the crew.</span></div>
+    <div class="sigline"><div>Supervisor signature / time</div><div>HSE verification / time</div><div>Close-out / time</div></div>`;
+  document.getElementById("permitDoc").scrollIntoView({behavior:"smooth"});
+}
+
+/* ================= init ================= */
+buildTLVtable();
+faRender();
+loadSettings();
+banStatus();
+(function(){
+  const n = new Date();
+  n.setMinutes(n.getMinutes() - n.getTimezoneOffset());
+  document.getElementById("g_dt").value = n.toISOString().slice(0,16);
+  document.getElementById("a_start").value = n.toISOString().slice(0,10);
+})();
+</script>
+</body>
+</html>
